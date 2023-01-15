@@ -10,10 +10,18 @@
 # define HEIGHT 400
 
 # include <stdio.h>
-#include <stdbool.h>
+# include <stdbool.h>
+# include <math.h>
 # include "../gnl/includes/get_next_line.h"
 # include "../libft/includes/libft.h"
 # include "../minilibx-linux/mlx.h"
+
+typedef struct s_dis
+{
+	float	a;
+	float	b;
+	float	c;
+}				t_dis;
 
 typedef struct s_vec
 {

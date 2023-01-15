@@ -10,24 +10,72 @@ int	key_handler(int keycode, t_info *info)
 	return (0);
 }
 
-bool	is_crossed_with_sph(t_vec eye_dir, t_vec eye_to_sph, float r)
-{
-	float	a;
-	float	b;
-	float	c;
-
-	a = vec_equ(eye_to_sph);
-	b = 2 * innner_product(eye_dir, eye_to_sph);
-	c = vec_equ(eye_dir) - r * r;
-	return (b * b - 4 * a * c >= 0);
-}
-
 void	put_pixel(t_info *info, int x, int y, int color)
 {
 	char	*dst;
 
 	dst = info->img_data + (y * info->line_length + x * info->bytes_per_pixel);
 	*(int *)dst = color;
+}
+
+float	is_crossed_with_sph(t_dis dis)
+{
+	return (dis.b * dis.b - 4 * dis.a * dis.c);
+}
+
+//coefficient = 係数
+float	get_coef(t_vec eye_dir, t_vec eye_to_sph, float r)
+{
+	t_dis	dis;
+	float	t;
+	float	t1;
+	float	t2;
+	float	d;
+
+	dis.a = vec_equ(eye_to_sph);
+	dis.b = 2 * innner_product(eye_dir, eye_to_sph);
+	dis.c = vec_equ(eye_dir) - r * r;
+	d = is_crossed_with_sph(dis);
+	t = -1;
+	if (d == 0)
+	{
+		t = - dis.b / (2 * dis.a);
+	}
+	else if (d > 0)
+	{
+		t1 = (- 1 * dis.b - sqrtf(d)) / (2 * dis.a);
+		t2 = (- 1 * dis.b + sqrtf(d)) / (2 * dis.a);
+		if (t1 > 0 && t2 > 0)
+			t = ft_min(t1, t2);
+		else
+			t = ft_max(t1, t2);
+	}
+	printf("[%f]\n", t);
+	return (t);
+}
+
+float	crossed_sphere_process(t_vec eye_dir, t_vec eye_to_sph, float t)
+{
+	t_vec	int_pos;//レイと球の交点位置
+	t_vec	light_dir;//入射ベクトル
+	t_vec	sphere_n;//球面の法線
+	t_vec	pl;//光源位置
+
+	float	nl_dot;//内積
+
+	int_pos.x = eye_dir.x + t * eye_to_sph.x;
+	int_pos.y = eye_dir.y + t * eye_to_sph.y;
+	int_pos.z = eye_dir.z + t * eye_to_sph.z;
+
+	pl = init_vec(-5, 5, -5);
+	light_dir = init_vec(pl.x - int_pos.x, pl.y - int_pos.y, pl.z - int_pos.z);
+
+	sphere_n = init_vec(int_pos.x, int_pos.y, int_pos.z);
+
+	nl_dot = innner_product(light_dir, sphere_n);
+	if (nl_dot < 0)
+		nl_dot = 0;
+	return (nl_dot);
 }
 
 void	draw_win(t_info *info)
@@ -37,6 +85,8 @@ void	draw_win(t_info *info)
 	t_vec	eye_dir;
 	t_vec	eye_to_sph;
 	float	r;
+	float	t;
+	float	nl_dot;
 
 	y = 0;
 	while (y < HEIGHT)
@@ -44,13 +94,21 @@ void	draw_win(t_info *info)
 		x = 0;
 		while (x < WIDTH)
 		{
-			eye_dir = init_vec(0, 0, 1000);
+			eye_dir = init_vec(0, 0, -5);
 			eye_to_sph = get_vec_diff(x, y, eye_dir);
 			r = (float )0.5;
-			if (is_crossed_with_sph(eye_dir, eye_to_sph, r))
-				put_pixel(info, x, y, create_rgb(255, 0, 0));
+			//
+			t = get_coef(eye_dir, eye_to_sph, r);
+			if (t > 0)
+			{
+				nl_dot = crossed_sphere_process(eye_dir, eye_to_sph, t);
+				put_pixel(info, x, y, 256 * (int)nl_dot);
+				printf("hoge\n");
+			}
 			else
+			{
 				put_pixel(info, x, y, create_rgb(100, 149, 237));
+			}
 			x++;
 		}
 		y++;
