@@ -20,3 +20,13 @@ int	close_window(t_info *info)
 	mlx_destroy_display(info->mlx_ptr);
 	exit(EXIT_SUCCESS);
 }
+
+t_vec	screen_to_coord(int x, int y)
+{
+	t_vec	ret;
+
+	ret.x = 2 * (float)x / (WIDTH - 1) - 1;
+	ret.y = -2 * (float)y / (HEIGHT - 1) + 1;
+	ret.z = 0;
+	return (ret);
+}

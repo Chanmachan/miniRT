@@ -13,20 +13,13 @@ t_vec	init_vec(float x, float y, float z)
 	return (ret);
 }
 
-t_vec	get_vec_diff(int x, int y, t_vec eye_dir)
+t_vec	diff_vec(t_vec v1, t_vec v2)
 {
-	t_vec	tmp;
 	t_vec	ret;
 
-	//Firstly, convert screen to coord
-	tmp.x = 2 * (float)x / (WIDTH - 1) - 1;
-	tmp.y = -2 * (float)y / (HEIGHT - 1) + 1;
-	tmp.z = 0;
-
-	//diff
-	ret.x = tmp.x - eye_dir.x;
-	ret.y = tmp.y - eye_dir.y;
-	ret.z = tmp.z - eye_dir.z;
+	ret.x = v1.x - v2.x;
+	ret.y = v1.y - v2.y;
+	ret.z = v1.z - v2.z;
 	return (ret);
 }
 
@@ -35,7 +28,7 @@ t_vec	normalize_vec(t_vec bef)
 	t_vec	id;
 	float	abs;
 
-	abs = vec_equ(bef);
+	abs = sqrtf(vec_equ(bef));
 	id.x = bef.x / abs;
 	id.y = bef.y / abs;
 	id.z = bef.z / abs;

@@ -39,12 +39,10 @@ float	get_coef(t_vec eye_dir, t_vec eye_to_sph, float r)
 	t = -1;
 	if (d == 0)
 	{
-		printf("piyo\n");
 		t = - dis.b / (2 * dis.a);
 	}
 	else if (d > 0)
 	{
-		printf("hoge\n");
 		t1 = (- 1 * dis.b - sqrtf(d)) / (2 * dis.a);
 		t2 = (- 1 * dis.b + sqrtf(d)) / (2 * dis.a);
 		if (t1 > 0 && t2 > 0)
@@ -98,14 +96,14 @@ void	draw_win(t_info *info)
 		while (x < WIDTH)
 		{
 			eye_dir = init_vec(0, 0, -5);
-			eye_to_sph = get_vec_diff(x, y, eye_dir);
+			eye_to_sph = diff_vec(screen_to_coord(x, y),eye_dir);
 			r = (float )0.5;
 			//
 			t = get_coef(eye_dir, eye_to_sph, r);
 			if (t > 0)
 			{
 				nl_dot = crossed_sphere_process(eye_dir, eye_to_sph, t);
-				put_pixel(info, x, y, create_rgb(255 * (int)nl_dot, 0, 255 * (int)nl_dot));
+				put_pixel(info, x, y, create_rgb(255 * nl_dot, 255 * nl_dot, 255 * nl_dot));
 			}
 			else
 			{
