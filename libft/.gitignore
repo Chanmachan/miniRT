@@ -1,0 +1,9 @@
+*.out
+
+libftTester
+libft-tester-tokyo
+libft-unit-test
+
+*.DS_Store
+
+*.idea
