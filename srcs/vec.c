@@ -24,10 +24,22 @@ t_vec	get_vec_diff(int x, int y, t_vec eye_dir)
 	tmp.z = 0;
 
 	//diff
-	ret.x = eye_dir.x - tmp.x;
-	ret.y = eye_dir.y - tmp.y;
-	ret.z = eye_dir.z - tmp.z;
+	ret.x = tmp.x - eye_dir.x;
+	ret.y = tmp.y - eye_dir.y;
+	ret.z = tmp.z - eye_dir.z;
 	return (ret);
+}
+
+t_vec	normalize_vec(t_vec bef)
+{
+	t_vec	id;
+	float	abs;
+
+	abs = vec_equ(bef);
+	id.x = bef.x / abs;
+	id.y = bef.y / abs;
+	id.z = bef.z / abs;
+	return (id);
 }
 
 float	vec_equ(t_vec v)

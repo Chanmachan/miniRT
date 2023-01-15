@@ -50,5 +50,6 @@ float	vec_equ(t_vec v);
 int	create_rgb(int r, int g, int b);
 float	innner_product(t_vec v1, t_vec v2);
 int	close_window(t_info *info);
+t_vec	normalize_vec(t_vec bef);
 
 #endif //MINIRT_MINIRT_H

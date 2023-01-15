@@ -39,10 +39,12 @@ float	get_coef(t_vec eye_dir, t_vec eye_to_sph, float r)
 	t = -1;
 	if (d == 0)
 	{
+		printf("piyo\n");
 		t = - dis.b / (2 * dis.a);
 	}
 	else if (d > 0)
 	{
+		printf("hoge\n");
 		t1 = (- 1 * dis.b - sqrtf(d)) / (2 * dis.a);
 		t2 = (- 1 * dis.b + sqrtf(d)) / (2 * dis.a);
 		if (t1 > 0 && t2 > 0)
@@ -50,7 +52,6 @@ float	get_coef(t_vec eye_dir, t_vec eye_to_sph, float r)
 		else
 			t = ft_max(t1, t2);
 	}
-	printf("[%f]\n", t);
 	return (t);
 }
 
@@ -69,8 +70,10 @@ float	crossed_sphere_process(t_vec eye_dir, t_vec eye_to_sph, float t)
 
 	pl = init_vec(-5, 5, -5);
 	light_dir = init_vec(pl.x - int_pos.x, pl.y - int_pos.y, pl.z - int_pos.z);
+	light_dir = normalize_vec(light_dir);
 
 	sphere_n = init_vec(int_pos.x, int_pos.y, int_pos.z);
+	sphere_n = normalize_vec(sphere_n);
 
 	nl_dot = innner_product(light_dir, sphere_n);
 	if (nl_dot < 0)
@@ -102,8 +105,7 @@ void	draw_win(t_info *info)
 			if (t > 0)
 			{
 				nl_dot = crossed_sphere_process(eye_dir, eye_to_sph, t);
-				put_pixel(info, x, y, 256 * (int)nl_dot);
-				printf("hoge\n");
+				put_pixel(info, x, y, create_rgb(255 * (int)nl_dot, 0, 255 * (int)nl_dot));
 			}
 			else
 			{
