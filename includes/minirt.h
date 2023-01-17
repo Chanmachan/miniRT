@@ -13,6 +13,7 @@
 # include <stdbool.h>
 # include <math.h>
 # include <float.h>
+# include <stdarg.h>
 # include "../gnl/includes/get_next_line.h"
 # include "../libft/includes/libft.h"
 # include "../minilibx-linux/mlx.h"
@@ -59,15 +60,15 @@ typedef struct	s_plane
 	t_vec	position;//面が通る点の位置ベクトル
 }				t_plane;
 
-typedef enum	e_type
+typedef enum	e_shape_type
 {
 	SPHERE,
 	PLANE,
-}				t_type;
+}				t_shape_type;
 
 typedef struct	s_shape
 {
-	t_type		type;
+	t_shape_type	type;
 	union
 	{
 		t_sphere	sphere;//球かか平面のどちらかの情報を持つ
@@ -128,6 +129,7 @@ typedef struct	s_info
 	int		line_length;
 	int		endian;
 	int		bytes_per_pixel;
+	t_scene	*scene;
 }				t_info;
 
 // init
@@ -136,7 +138,7 @@ void	init_color(t_color *color, float r, float g, float b);
 // vec
 t_vec	init_vec(float x, float y, float z);
 t_vec	get_vec_diff(int x, int y, t_vec eye_dir);
-float	vec_equ(t_vec v);
+float	dot_vec(t_vec v1, t_vec v2);
 t_vec	add_vec(t_vec v1, t_vec v2);
 t_vec	multiple_vec(float m, t_vec v);
 // utils

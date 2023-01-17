@@ -28,16 +28,16 @@ t_vec	normalize_vec(t_vec bef)
 	t_vec	id;
 	float	abs;
 
-	abs = sqrtf(vec_equ(bef));
+	abs = sqrtf(dot_vec(bef, bef));
 	id.x = bef.x / abs;
 	id.y = bef.y / abs;
 	id.z = bef.z / abs;
 	return (id);
 }
 
-float	vec_equ(t_vec v)
+float	dot_vec(t_vec v1, t_vec v2)
 {
-	return (v.x * v.x + v.y * v.y + v.z * v.z);
+	return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
 }
 
 t_vec	add_vec(t_vec v1, t_vec v2)
