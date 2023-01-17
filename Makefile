@@ -6,7 +6,9 @@ OBJS_DIR = ./objs
 
 SRCS_FILE = main.c \
 			utils.c \
-			vec.c
+			vec.c \
+			init.c \
+			raytrace.c
 
 SRCS = $(addprefix $(SRCS_DIR)/, $(SRCS_FILE))
 

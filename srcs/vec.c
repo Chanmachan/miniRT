@@ -39,3 +39,19 @@ float	vec_equ(t_vec v)
 {
 	return (v.x * v.x + v.y * v.y + v.z * v.z);
 }
+
+t_vec	add_vec(t_vec v1, t_vec v2)
+{
+	return ((t_vec){
+		.x = v1.x + v2.x,
+		.y = v1.y + v2.y,
+		.z = v1.z + v2.z});
+}
+
+t_vec	multiple_vec(float m, t_vec v)
+{
+	return ((t_vec){
+			.x = m * v.x,
+			.y = m * v.y,
+			.z = m * v.z});
+}

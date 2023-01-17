@@ -10,18 +10,12 @@ int	key_handler(int keycode, t_info *info)
 	return (0);
 }
 
-void	put_pixel(t_info *info, int x, int y, int color)
-{
-	char	*dst;
-
-	dst = info->img_data + (y * info->line_length + x * info->bytes_per_pixel);
-	*(int *)dst = color;
-}
-
+/*
 float	is_crossed_with_sph(t_dis dis)
 {
 	return (dis.b * dis.b - 4 * dis.a * dis.c);
 }
+ */
 
 //coefficient = 係数
 float	get_coef(t_vec eye_dir, t_vec eye_to_sph, float r)
@@ -103,6 +97,7 @@ float	crossed_sphere_process(t_vec eye_dir, t_vec eye_to_sph, float t)
 	return (Rr);
 }
 
+/*
 void	draw_win(t_info *info)
 {
 	int		x;
@@ -138,6 +133,41 @@ void	draw_win(t_info *info)
 		y++;
 	}
 }
+*/
+
+int draw_win(t_info *info)
+{
+	int				x, y;
+	t_scene			scene;
+	const t_vec		eye_pos = {0, 0, -5};//始点位置
+	t_ray			eye_ray;
+	t_color			color;
+
+
+	// とりあえずmalloc???
+	scene.lights = malloc(sizeof(t_light));
+	scene.shapes = malloc(sizeof(t_shape));
+	y = 0;
+	while (y < HEIGHT)
+	{
+		x = 0;
+		while (x < WIDTH)
+		{
+			color = init_color(100, 149, 237);
+			eye_ray.start = eye_pos;
+			eye_ray.direction = diff_vec(screen_to_coord(x, y), eye_pos);
+
+			raytrace(&scene, &eye_ray, &color);
+
+			put_pixel(info, x, y, create_rgb(color));
+			x++;
+		}
+		y++;
+	}
+	free(scene.lights);
+	free(scene.shapes);
+	return (0);
+}
 
 int	loop_handler(t_info *info)
 {
@@ -152,15 +182,6 @@ void	hook(t_info *info)
 	mlx_hook(info->win_ptr, 17, 1L << 0, close_window, info);
 	mlx_hook(info->win_ptr, 2, 1L << 0, key_handler, info);
 	mlx_loop(info->mlx_ptr);
-}
-
-void	init(t_info *info)
-{
-	info->mlx_ptr = mlx_init();
-	info->img_ptr = mlx_new_image(info->mlx_ptr, WIDTH, HEIGHT);
-	info->win_ptr = mlx_new_window(info->mlx_ptr, WIDTH, HEIGHT, "miniRT");
-	info->img_data = mlx_get_data_addr(info->img_ptr, &info->bits_per_pixel, &info->line_length, &info->endian);
-	info->bytes_per_pixel = info->bits_per_pixel / 8;
 }
 
 int main()

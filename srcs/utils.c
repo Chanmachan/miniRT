@@ -3,9 +3,9 @@
 //
 #include "../includes/minirt.h"
 
-int	create_rgb(int r, int g, int b)
+int	create_rgb(t_color color)
 {
-	return (r << 16 | g << 8 | b);
+	return ((int)color.r << 16 | (int)color.g << 8 | (int)color.b);
 }
 
 float	innner_product(t_vec v1, t_vec v2)
@@ -29,4 +29,12 @@ t_vec	screen_to_coord(int x, int y)
 	ret.y = -2 * (float)y / (HEIGHT - 1) + 1;
 	ret.z = 0;
 	return (ret);
+}
+
+void	put_pixel(t_info *info, int x, int y, int color)
+{
+	char	*dst;
+
+	dst = info->img_data + (y * info->line_length + x * info->bytes_per_pixel);
+	*(int *)dst = color;
 }

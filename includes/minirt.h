@@ -12,6 +12,7 @@
 # include <stdio.h>
 # include <stdbool.h>
 # include <math.h>
+# include <float.h>
 # include "../gnl/includes/get_next_line.h"
 # include "../libft/includes/libft.h"
 # include "../minilibx-linux/mlx.h"
@@ -113,6 +114,8 @@ typedef struct	s_dis
 	float	a;
 	float	b;
 	float	c;
+	float	d;
+	float	t;
 }				t_dis;
 
 typedef struct	s_info
@@ -127,16 +130,24 @@ typedef struct	s_info
 	int		bytes_per_pixel;
 }				t_info;
 
-//vec
+// init
+void	init(t_info *info);
+void	init_color(t_color *color, float r, float g, float b);
+// vec
 t_vec	init_vec(float x, float y, float z);
 t_vec	get_vec_diff(int x, int y, t_vec eye_dir);
 float	vec_equ(t_vec v);
+t_vec	add_vec(t_vec v1, t_vec v2);
+t_vec	multiple_vec(float m, t_vec v);
 // utils
-int	create_rgb(int r, int g, int b);
+int		create_rgb(t_color color);
 float	innner_product(t_vec v1, t_vec v2);
-int	close_window(t_info *info);
+int		close_window(t_info *info);
 t_vec	normalize_vec(t_vec bef);
 t_vec	screen_to_coord(int x, int y);
 t_vec	diff_vec(t_vec v1, t_vec v2);
+void	put_pixel(t_info *info, int x, int y, int color);
+// raytrace
+int		raytrace(t_scene *scene, t_ray *eye_ray, t_color *out_color);
 
 #endif //MINIRT_MINIRT_H
