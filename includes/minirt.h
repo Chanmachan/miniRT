@@ -14,6 +14,8 @@
 # include <math.h>
 # include <float.h>
 # include <stdarg.h>
+# include <stdlib.h>
+# include <time.h>
 # include "../gnl/includes/get_next_line.h"
 # include "../libft/includes/libft.h"
 # include "../minilibx-linux/mlx.h"
@@ -101,6 +103,7 @@ typedef struct	s_scene
 	size_t	num_lights_capa;//光源リストへの最大格納数
 	size_t	num_lights;//光源リストに実際格納されている数
 	t_color	ambient_illuminance;//環境光の強さ
+	t_vec	eye_pos;//始点位
 }				t_scene;
 
 typedef struct	s_intersect_point
@@ -149,6 +152,7 @@ t_vec	normalize_vec(t_vec bef);
 t_vec	screen_to_coord(int x, int y);
 t_vec	diff_vec(t_vec v1, t_vec v2);
 void	put_pixel(t_info *info, int x, int y, int color);
+float	rand_restricted(float min, float max);
 // raytrace
 int		raytrace(t_scene *scene, t_ray *eye_ray, t_color *out_color);
 

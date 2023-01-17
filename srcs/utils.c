@@ -38,3 +38,8 @@ void	put_pixel(t_info *info, int x, int y, int color)
 	dst = info->img_data + (y * info->line_length + x * info->bytes_per_pixel);
 	*(int *)dst = color;
 }
+
+float	rand_restricted(float min, float max)
+{
+	return (min + (float)(rand() * (max - min + 1.0) / (1.0 + RAND_MAX)));
+}

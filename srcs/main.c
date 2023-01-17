@@ -13,7 +13,6 @@ int	key_handler(int keycode, t_info *info)
 int draw_win(t_info *info, t_scene *scene)
 {
 	int				x, y;
-	const t_vec		eye_pos = {0, 0, -100};//始点位置
 	t_ray			eye_ray;
 	t_color			color;
 
@@ -24,8 +23,8 @@ int draw_win(t_info *info, t_scene *scene)
 		while (x < WIDTH)
 		{
 			init_color(&color, 100, 149, 237);
-			eye_ray.start = eye_pos;
-			eye_ray.direction = diff_vec(screen_to_coord(x, y), eye_pos);
+			eye_ray.start = scene->eye_pos;
+			eye_ray.direction = diff_vec(screen_to_coord(x, y), eye_ray.start);
 
 			raytrace(scene, &eye_ray, &color);
 			put_pixel(info, x, y, create_rgb(color));

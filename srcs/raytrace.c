@@ -5,17 +5,19 @@ t_dis	intersect_discriminant(t_shape *shape, t_ray *ray)
 	t_dis		dis;
 	float		t1;
 	float		t2;
-	t_sphere	sphere;
+	t_sphere	*sphere;
+	t_vec		pe_pc;
 
-	sphere = shape->u_data.sphere;
-	dis.a = dot_vec(ray->direction, ray->direction);
-	dis.b = 2 * innner_product(ray->start, ray->direction);
-	dis.c = dot_vec(ray->start, ray->start) - sphere.radius * sphere.radius;
+	sphere = &shape->u_data.sphere;
+	pe_pc = diff_vec(ray->start, sphere->center);
+	dis.a = innner_product(ray->direction, ray->direction);
+	dis.b = 2 * innner_product(pe_pc, ray->direction);
+	dis.c = innner_product(pe_pc, pe_pc) - sphere->radius * sphere->radius;
 	dis.d = dis.b * dis.b - 4 * dis.a * dis.c;
 	dis.t = -1;
 	if (dis.d == 0)
 	{
-		dis.t = -dis.d / (2 * dis.a);
+		dis.t = -dis.b / (2 * dis.a);
 	}
 	else if (dis.d > 0)
 	{
@@ -32,10 +34,10 @@ t_dis	intersect_discriminant(t_shape *shape, t_ray *ray)
 int	intersect_sph(t_shape *shape, t_ray *ray, t_intersect_point *out_intp)
 {
 	t_dis		dis;
-	t_sphere	sphere;
+	t_sphere	*sphere;
 
 	dis = intersect_discriminant(shape, ray);
-	sphere = shape->u_data.sphere;
+	sphere = &shape->u_data.sphere;
 	if (0 < dis.t)
 	{
 		if (out_intp)
@@ -44,7 +46,7 @@ int	intersect_sph(t_shape *shape, t_ray *ray, t_intersect_point *out_intp)
 			//最も近い物体の構造体のポインタを計算
 			out_intp->position = add_vec(ray->start, multiple_vec(dis.t, ray->direction));
 			//交点における物体表面の法線ベクトル
-			out_intp->normal = diff_vec(out_intp->position, sphere.center);
+			out_intp->normal = diff_vec(out_intp->position, sphere->center);
 			out_intp->normal = normalize_vec(out_intp->normal);
 		}
 		return (1);
@@ -113,7 +115,7 @@ int	get_nearest_shape(t_scene *scene, t_ray *ray, float max_dist, int exit_once_
 	{
 		int res;
 
-		res = intersect(&scene->shapes[i], ray, &intp);
+		res = intersect(&scene->shapes[i]	, ray, &intp);
 		if ( res && intp.distance < nearest_intp.distance )
 		{
 			nearest_shape = &scene->shapes[i];
@@ -153,7 +155,7 @@ int	raytrace(t_scene *scene, t_ray *eye_ray, t_color *out_color)
 	float				vr_dot_pow;
 
 	//tmp
-	res = get_nearest_shape(scene, eye_ray, FLT_MAX, 1, &shape, &int_p);
+	res = get_nearest_shape(scene, eye_ray, FLT_MAX, 0, &shape, &int_p);
 
 	if (res)
 	{
@@ -170,9 +172,9 @@ int	raytrace(t_scene *scene, t_ray *eye_ray, t_color *out_color)
 				light_dir = normalize_vec(multiple_vec(-1, scene->lights[i].vec));
 			nl_dot = innner_product(int_p.normal, light_dir);
 			nl_dot = ft_min(ft_max(nl_dot, 0), 1);
-			out_color->r += scene->shapes->material.diffuse_ref.r * scene->lights[i].illuminance.r * nl_dot;
-			out_color->g += scene->shapes->material.diffuse_ref.g * scene->lights[i].illuminance.g * nl_dot;
-			out_color->b += scene->shapes->material.diffuse_ref.b * scene->lights[i].illuminance.b * nl_dot;
+			out_color->r += shape->material.diffuse_ref.r * scene->lights[i].illuminance.r * nl_dot;
+			out_color->g += shape->material.diffuse_ref.g * scene->lights[i].illuminance.g * nl_dot;
+			out_color->b += shape->material.diffuse_ref.b * scene->lights[i].illuminance.b * nl_dot;
 			if (nl_dot > 0)
 			{
 				//正反射ベクトル
@@ -184,9 +186,9 @@ int	raytrace(t_scene *scene, t_ray *eye_ray, t_color *out_color)
 				vr_dot = ft_min(ft_max(vr_dot, 0), 1);
 				vr_dot_pow = powf(vr_dot, scene->shapes->material.shininess);
 				//鏡面反射光の計算
-				out_color->r += scene->shapes->material.specular_ref.r * scene->lights[i].illuminance.r * vr_dot_pow;
-				out_color->g += scene->shapes->material.specular_ref.g * scene->lights[i].illuminance.g * vr_dot_pow;
-				out_color->b += scene->shapes->material.specular_ref.b * scene->lights[i].illuminance.b * vr_dot_pow;
+				out_color->r += shape->material.specular_ref.r * scene->lights[i].illuminance.r * vr_dot_pow;
+				out_color->g += shape->material.specular_ref.g * scene->lights[i].illuminance.g * vr_dot_pow;
+				out_color->b += shape->material.specular_ref.b * scene->lights[i].illuminance.b * vr_dot_pow;
 			}
 			i++;
 		}
@@ -194,7 +196,6 @@ int	raytrace(t_scene *scene, t_ray *eye_ray, t_color *out_color)
 		out_color->r = 255 * ft_min(ft_max(out_color->r, 0), 1);
 		out_color->g = 255 * ft_min(ft_max(out_color->g, 0), 1);
 		out_color->b = 255 * ft_min(ft_max(out_color->b, 0), 1);
-		printf("[%f]\n", out_color->r);
 
 		return (1);
 	}
