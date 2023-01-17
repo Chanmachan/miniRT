@@ -18,7 +18,7 @@ float	is_crossed_with_sph(t_dis dis)
  */
 
 //coefficient = 係数
-float	get_coef(t_vec eye_dir, t_vec eye_to_sph, float r)
+/*float	get_coef(t_vec eye_dir, t_vec eye_to_sph, float r)
 {
 	t_dis	dis;
 	float	t1;
@@ -43,8 +43,9 @@ float	get_coef(t_vec eye_dir, t_vec eye_to_sph, float r)
 			return (ft_max(t1, t2));
 	}
 	return (-1);
-}
+}*/
 
+/*
 float	crossed_sphere_process(t_vec eye_dir, t_vec eye_to_sph, float t)
 {
 	t_vec	int_pos;//レイと球の交点位置
@@ -96,6 +97,7 @@ float	crossed_sphere_process(t_vec eye_dir, t_vec eye_to_sph, float t)
 	Rr = Ra + Rd + Rs;
 	return (Rr);
 }
+*/
 
 /*
 void	draw_win(t_info *info)
@@ -153,7 +155,7 @@ int draw_win(t_info *info)
 		x = 0;
 		while (x < WIDTH)
 		{
-			color = init_color(100, 149, 237);
+			init_color(&color, 100, 149, 237);
 			eye_ray.start = eye_pos;
 			eye_ray.direction = diff_vec(screen_to_coord(x, y), eye_pos);
 
