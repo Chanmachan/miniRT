@@ -8,7 +8,7 @@ int	create_rgb(t_color color)
 	return ((int)color.r << 16 | (int)color.g << 8 | (int)color.b);
 }
 
-float	innner_product(t_vec v1, t_vec v2)
+float	inner_product(t_vec v1, t_vec v2)
 {
 	return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
 }

@@ -55,3 +55,8 @@ t_vec	multiple_vec(float m, t_vec v)
 			.y = m * v.y,
 			.z = m * v.z});
 }
+
+float	abs_vec(t_vec v)
+{
+	return (sqrtf(inner_product(v, v)));
+}

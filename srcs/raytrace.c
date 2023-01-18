@@ -10,9 +10,9 @@ t_dis	intersect_discriminant(t_shape *shape, t_ray *ray)
 
 	sphere = &shape->u_data.sphere;
 	pe_pc = diff_vec(ray->start, sphere->center);
-	dis.a = innner_product(ray->direction, ray->direction);
-	dis.b = 2 * innner_product(pe_pc, ray->direction);
-	dis.c = innner_product(pe_pc, pe_pc) - sphere->radius * sphere->radius;
+	dis.a = inner_product(ray->direction, ray->direction);
+	dis.b = 2 * inner_product(pe_pc, ray->direction);
+	dis.c = inner_product(pe_pc, pe_pc) - sphere->radius * sphere->radius;
 	dis.d = dis.b * dis.b - 4 * dis.a * dis.c;
 	dis.t = -1;
 	if (dis.d == 0)
@@ -102,7 +102,7 @@ int	intersect(t_shape *shape, t_ray *ray, t_intersect_point *out_intp)
 	return (0);
 }
 
-int	get_nearest_shape(t_scene *scene, t_ray *ray, float max_dist, int exit_once_found, t_shape **out_shape, t_intersect_point *out_intp)
+int	get_nearest_shape(t_scene *scene, t_ray *ray, float max_dist, bool exit_once_found, t_shape **out_shape, t_intersect_point *out_intp)
 {
 	size_t	i;
 	t_shape *nearest_shape = NULL;
@@ -113,8 +113,6 @@ int	get_nearest_shape(t_scene *scene, t_ray *ray, float max_dist, int exit_once_
 	i = 0;
 	while (i < scene->num_shapes)
 	{
-		;
-		//|| にするとまた違う感じになる
 		if (intersect(&scene->shapes[i], ray, &intp)  && \
 			intp.distance < nearest_intp.distance )
 		{
@@ -146,7 +144,9 @@ int	raytrace(t_scene *scene, t_ray *eye_ray, t_color *out_color)
 	t_intersect_point	int_p; //交点
 	int					res;
 	size_t				i;
-	t_vec				light_dir;
+	t_vec				light_dir;//入射ベクトル
+	float				dl; //視線と光源の距離dt
+	t_ray				shadow_ray;
 	const t_light		*light;
 	float				nl_dot;
 	float				vr_dot;
@@ -154,8 +154,9 @@ int	raytrace(t_scene *scene, t_ray *eye_ray, t_color *out_color)
 	t_vec				inv_eye_dir;
 	float				vr_dot_pow;
 
+
 	//tmp
-	res = get_nearest_shape(scene, eye_ray, FLT_MAX, 0, &shape, &int_p);
+	res = get_nearest_shape(scene, eye_ray, FLT_MAX, false, &shape, &int_p);
 
 	if (res)
 	{
@@ -166,29 +167,44 @@ int	raytrace(t_scene *scene, t_ray *eye_ray, t_color *out_color)
 		while (i < scene->num_lights)
 		{
 			light = &scene->lights[i];
+			//点光源
 			if (light->type == POINT)
-				light_dir = normalize_vec(diff_vec(scene->lights[i].vec, int_p.position));
-			else if (light->type == DIRECTIONAL)
-				light_dir = normalize_vec(multiple_vec(-1, scene->lights[i].vec));
-			nl_dot = innner_product(int_p.normal, light_dir);
-			nl_dot = ft_min(ft_max(nl_dot, 0), 1);
-			out_color->r += shape->material.diffuse_ref.r * scene->lights[i].illuminance.r * nl_dot;
-			out_color->g += shape->material.diffuse_ref.g * scene->lights[i].illuminance.g * nl_dot;
-			out_color->b += shape->material.diffuse_ref.b * scene->lights[i].illuminance.b * nl_dot;
-			if (nl_dot > 0)
 			{
-				//正反射ベクトル
-				ref_dir = normalize_vec(diff_vec(multiple_vec(2 * nl_dot, int_p.normal), light_dir));
-				//視線ベクトルの逆ベクトルの計算
-				inv_eye_dir = normalize_vec(multiple_vec(-1, eye_ray->direction));
-				//上二つの内積
-				vr_dot = innner_product(ref_dir, inv_eye_dir);
-				vr_dot = ft_min(ft_max(vr_dot, 0), 1);
-				vr_dot_pow = powf(vr_dot, scene->shapes->material.shininess);
-				//鏡面反射光の計算
-				out_color->r += shape->material.specular_ref.r * scene->lights[i].illuminance.r * vr_dot_pow;
-				out_color->g += shape->material.specular_ref.g * scene->lights[i].illuminance.g * vr_dot_pow;
-				out_color->b += shape->material.specular_ref.b * scene->lights[i].illuminance.b * vr_dot_pow;
+				light_dir = diff_vec(scene->lights[i].vec, int_p.position);
+				dl = abs_vec(light_dir) - EPSILON;
+			}
+				//平行光源
+			else if (light->type == DIRECTIONAL)
+			{
+				light_dir = multiple_vec(-1, scene->lights[i].vec);
+				dl = INFINITY;
+			}
+			//シャドウレイ(ε=1/512)
+			shadow_ray.start = add_vec(int_p.position, multiple_vec(EPSILON, light_dir));
+			shadow_ray.direction = light_dir;
+			//交差判定
+			if (!get_nearest_shape(scene, &shadow_ray, dl, true, NULL, NULL))
+			{
+				light_dir = normalize_vec(light_dir);
+				nl_dot = inner_product(int_p.normal, light_dir);
+				nl_dot = ft_min(ft_max(nl_dot, 0), 1);
+				out_color->r += shape->material.diffuse_ref.r * scene->lights[i].illuminance.r * nl_dot;
+				out_color->g += shape->material.diffuse_ref.g * scene->lights[i].illuminance.g * nl_dot;
+				out_color->b += shape->material.diffuse_ref.b * scene->lights[i].illuminance.b * nl_dot;
+				if (nl_dot > 0) {
+					//正反射ベクトル
+					ref_dir = normalize_vec(diff_vec(multiple_vec(2 * nl_dot, int_p.normal), light_dir));
+					//視線ベクトルの逆ベクトルの計算
+					inv_eye_dir = normalize_vec(multiple_vec(-1, eye_ray->direction));
+					//上二つの内積
+					vr_dot = inner_product(ref_dir, inv_eye_dir);
+					vr_dot = ft_min(ft_max(vr_dot, 0), 1);
+					vr_dot_pow = powf(vr_dot, scene->shapes->material.shininess);
+					//鏡面反射光の計算
+					out_color->r += shape->material.specular_ref.r * scene->lights[i].illuminance.r * vr_dot_pow;
+					out_color->g += shape->material.specular_ref.g * scene->lights[i].illuminance.g * vr_dot_pow;
+					out_color->b += shape->material.specular_ref.b * scene->lights[i].illuminance.b * vr_dot_pow;
+				}
 			}
 			i++;
 		}

@@ -9,6 +9,9 @@
 # define WIDTH 400
 # define HEIGHT 400
 
+# define EPSILON (1.0f/512)
+# define INFINITY FLT_MAX
+
 # include <stdio.h>
 # include <stdbool.h>
 # include <math.h>
@@ -103,7 +106,7 @@ typedef struct	s_scene
 	size_t	num_lights_capa;//光源リストへの最大格納数
 	size_t	num_lights;//光源リストに実際格納されている数
 	t_color	ambient_illuminance;//環境光の強さ
-	t_vec	eye_pos;//始点位
+	t_vec	eye_pos;//始点位置
 }				t_scene;
 
 typedef struct	s_intersect_point
@@ -144,9 +147,10 @@ t_vec	get_vec_diff(int x, int y, t_vec eye_dir);
 float	dot_vec(t_vec v1, t_vec v2);
 t_vec	add_vec(t_vec v1, t_vec v2);
 t_vec	multiple_vec(float m, t_vec v);
+float	abs_vec(t_vec v);
 // utils
 int		create_rgb(t_color color);
-float	innner_product(t_vec v1, t_vec v2);
+float	inner_product(t_vec v1, t_vec v2);
 int		close_window(t_info *info);
 t_vec	normalize_vec(t_vec bef);
 t_vec	screen_to_coord(int x, int y);
