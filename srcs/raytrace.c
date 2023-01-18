@@ -113,10 +113,10 @@ int	get_nearest_shape(t_scene *scene, t_ray *ray, float max_dist, int exit_once_
 	i = 0;
 	while (i < scene->num_shapes)
 	{
-		int res;
-
-		res = intersect(&scene->shapes[i]	, ray, &intp);
-		if ( res && intp.distance < nearest_intp.distance )
+		;
+		//|| にするとまた違う感じになる
+		if (intersect(&scene->shapes[i], ray, &intp)  && \
+			intp.distance < nearest_intp.distance )
 		{
 			nearest_shape = &scene->shapes[i];
 			nearest_intp = intp;

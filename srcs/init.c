@@ -78,7 +78,7 @@ void scene_setting(t_scene *scene)
 	/* 平面の場合：第二引数にST_PLANEを渡す．この場合，追加で6つの実数を渡す． */
 
 	init_shape(&scene->shapes[0], PLANE,
-		   0.0, -0.5, 0.0, //平面が通る点の位置
+		   0.0, -1.0, 0.0, //平面が通る点の位置
 		   0.0, 1.0, 0.0); //平面の法線ベクトル
 
 	/* 補足：vector_t構造体に値を設定する場合は以下のように，SET_VECTORマクロを使うことができる． */
@@ -158,8 +158,8 @@ void	init(t_info *info)
 	info->img_data = mlx_get_data_addr(info->img_ptr, &info->bits_per_pixel, &info->line_length, &info->endian);
 	info->bytes_per_pixel = info->bits_per_pixel / 8;
 	info->scene = malloc(sizeof(t_scene));
-	scene_setting(info->scene);
 	srand((unsigned int)time(NULL));
+	scene_setting(info->scene);
 }
 
 void	init_color(t_color *color, float r, float g, float b)
